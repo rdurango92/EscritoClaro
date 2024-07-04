@@ -1,0 +1,2 @@
+# EscritoClaro
+Digitaliza textos manuscritos
