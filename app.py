@@ -1,49 +1,21 @@
-#%%
+## App: Escrito-Claro
+## Por: Ruben Durango
 
-#Aplicacion para digitalizar texto manuscrito usando gradio y el modelo Florence-2 de Hugging Face
+# Importaciones
+import gradio as gr
 
-#Fecha: 2024-07-04
-#Autor: @rdurango92
 
-#%% Importaciones
-
-import requests
-from PIL import Image
-from transformers import AutoProcessor, AutoModelForCausalLM, pipeline
-import torch
-
-#%% Cargar modelo y procesador
-
-ocr_model = AutoModelForCausalLM.from_pretrained("microsoft/Florence-2-large", trust_remote_code=True)
-ocr_processor = AutoProcessor.from_pretrained("microsoft/Florence-2-large", trust_remote_code=True)
-
-# Cargar modelo para corrección de texto
-device = 0 if torch.cuda.is_available() else -1 # -1 para CPU, 0 para GPU
-#correction_model = pipeline("text2text-generation", model="vennify/t5-base-grammar-correction", device=device)
-
-#%% Carga de Imagen
-
-image_path = "data/page3.jpg"
-image = Image.open(image_path)
-
-#%% Funcion para correr el ejemplo
-
-def run_ocr(task_prompt, image):
-    prompt = task_prompt
-    inputs = ocr_processor(text=prompt, images=image, return_tensors="pt")
-    generated_ids = ocr_model.generate(
-      input_ids=inputs["input_ids"],
-      pixel_values=inputs["pixel_values"],
-      max_new_tokens=1024,
-      num_beams=3
-    )
-    generated_text = ocr_processor.batch_decode(generated_ids, skip_special_tokens=False)[0]
-    parsed_answer = ocr_processor.post_process_generation(generated_text, task=task_prompt, image_size=(image.width, image.height))
-    return parsed_answer['<OCR>']
-
-#%% Ejecucion de la tarea
-prompt = "<OCR>"
-ocr_text = run_ocr(prompt, image)
-print("Texto OCR:", ocr_text)
-
-#%%
+# Interfaz princital
+with gr.Blocks() as demo:
+    gr.Markdown("<center><h1>🤓 Escrito-Claro</h1><br><h3>OCR con Florence-2</h3></center>")
+    gr.Markdown("Con **EscritoClaro**, convierte tus notas manuscritas en texto digital de forma rápida y precisa, utilizando el modelo Florence-2 de Microsoft.Esta aplicación extrae el texto de tus documentos con buena precisión. Simplemente sube una imagen y deja que EscritoClaro haga el resto.")
+    
+    # Entradas 
+    with gr.Column():
+        image = gr.Image(label="Imagen de entrada")
+        submit_btn = gr.Button(value="Procesar ⚙️")
+    
+    # Salidas
+    with gr.Column():
+        ocr_text = gr.Textbox(label="Texto OCR", placeholder="Texto extraído")
+demo.launch()
