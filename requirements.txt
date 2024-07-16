@@ -3,3 +3,5 @@ Pillow
 torch
 numpy
 transformers
+timm
+spaces

@@ -2,11 +2,15 @@
 ## Por: Ruben Durango
 
 # Importaciones
+import torch
 import gradio as gr
 from PIL import Image
 from transformers import AutoProcessor, AutoModelForCausalLM
-import torch
 import numpy as np
+
+# Solo para cuando se envia a spaces 
+#import subprocess
+#subprocess.run('pip install flash-attn --no-build-isolation', env={'FLASH_ATTENTION_SKIP_CUDA_BUILD': "TRUE"}, shell=True)
 
 # Cargar modelo y procesador
 ocr_model = AutoModelForCausalLM.from_pretrained("microsoft/Florence-2-large", trust_remote_code=True)
